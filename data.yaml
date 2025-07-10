@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 4
+names: ['boulder', 'branch', 'clear', 'person']
+
+roboflow:
+  workspace: objectdetection-nqppd
+  project: railwaytrack-96nbd
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/objectdetection-nqppd/railwaytrack-96nbd/dataset/1

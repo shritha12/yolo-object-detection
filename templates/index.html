@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robocoupler - AI Object Detection Platform</title>
+  <meta name="description" content="Advanced AI-powered object detection platform for real-time monitoring and analysis" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Home Page Styles */
+    .home-page {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+      position: relative;
+    }
+
+    .home-page::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://nordicapis.com/wp-content/uploads/7-Best-Image-Recognition-APIs-e1587080882739-1024x576.jpg') center/cover;
+      opacity: 0.1;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      position: relative;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2.5rem;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: #06b6d4;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .logo img {
+      height: 3rem;
+      margin-right: 1rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .nav-links a:hover {
+      color: #06b6d4;
+      background: rgba(6, 182, 212, 0.1);
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-outline {
+      border: 2px solid #06b6d4;
+      color: #06b6d4;
+      background: transparent;
+    }
+
+    .btn-outline:hover {
+      background: #06b6d4;
+      color: #0f172a;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0891b2, #2563eb);
+      transform: translateY(-2px);
+    }
+
+    .btn-large {
+      padding: 1rem 2rem;
+      font-size: 1.125rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 5rem 2rem;
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+    }
+
+    .hero .highlight {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      max-width: 42rem;
+      margin: 0 auto 3rem;
+      color: #cbd5e1;
+      line-height: 1.8;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 4rem;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      max-width: 60rem;
+      margin: 0 auto 5rem;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #06b6d4;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    /* Features Section */
+    .features {
+      position: relative;
+      z-index: 10;
+      padding: 5rem 2rem;
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .features h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 4rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 80rem;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: #06b6d4;
+      box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      color: #06b6d4;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card p {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* CTA Section */
+    .cta {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2));
+    }
+
+    .cta h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 1.5rem;
+    }
+
+    .cta p {
+      font-size: 1.25rem;
+      color: #cbd5e1;
+      max-width: 42rem;
+      margin: 0 auto 2rem;
+    }
+
+    /* Footer */
+    .footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 2rem;
+      background: #0f172a;
+      color: #64748b;
+      border-top: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    /* About Page Styles */
+    .about-page {
+      display: none;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+      position: relative;
+      padding: 2rem 0;
+    }
+
+    .about-page::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://nordicapis.com/wp-content/uploads/7-Best-Image-Recognition-APIs-e1587080882739-1024x576.jpg') center/cover;
+      opacity: 0.1;
+      z-index: 1;
+    }
+
+    .about-content {
+      position: relative;
+      z-index: 10;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 1rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      color: white;
+    }
+
+    .about-content h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #06b6d4;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .about-content h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #06b6d4;
+      margin: 2rem 0 1rem 0;
+    }
+
+    .about-content p {
+      margin-bottom: 1rem;
+      line-height: 1.8;
+      color: #cbd5e1;
+    }
+
+    .about-content ol, .about-content ul {
+      margin: 1rem 0;
+      padding-left: 2rem;
+      color: #cbd5e1;
+    }
+
+    .about-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    .about-content strong {
+      color: #06b6d4;
+    }
+
+    .about-content a {
+      color: #06b6d4;
+      text-decoration: none;
+    }
+
+    .about-content a:hover {
+      text-decoration: underline;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      text-decoration: none;
+      margin-bottom: 2rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      color: #06b6d4;
+    }
+
+    /* Contact Modal Styles */
+    .contact-modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+    }
+
+    .contact-modal-content {
+      background: #1a1a2e;
+      margin: 5% auto;
+      padding: 2rem;
+      border: 1px solid #06b6d4;
+      border-radius: 1rem;
+      width: 90%;
+      max-width: 500px;
+      color: white;
+      position: relative;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .contact-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-modal-header h2 {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .contact-close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .contact-close:hover {
+      color: white;
+    }
+
+    .contact-description {
+      color: #cbd5e1;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .contact-input,
+    .contact-textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #374151;
+      border-radius: 0.5rem;
+      background: #374151;
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .contact-input::placeholder,
+    .contact-textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    .contact-input:focus,
+    .contact-textarea:focus {
+      outline: none;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+    }
+
+    .contact-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .contact-submit {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .contact-submit:hover {
+      background: linear-gradient(135deg, #0891b2, #2563eb);
+      transform: translateY(-1px);
+    }
+
+    /* Auth Pages Styles */
+    .auth-page {
+      display: none;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-page::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://nordicapis.com/wp-content/uploads/7-Best-Image-Recognition-APIs-e1587080882739-1024x576.jpg') center/cover;
+      opacity: 0.1;
+      z-index: 1;
+    }
+
+    .auth-container {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      align-items: center;
+      min-height: 100vh;
+      width: 100%;
+      padding: 3rem;
+      gap: 3rem;
+    }
+
+    .auth-left {
+      background: transparent;
+      padding: 0;
+    }
+    
+    .auth-left-content {
+      position: relative;
+      z-index: 10;
+      color: white;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      text-decoration: none;
+      margin-bottom: 3rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: #06b6d4;
+    }
+
+    .auth-left h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .auth-left .highlight {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+    }
+
+    .auth-left p {
+      font-size: 1.125rem;
+      color: #cbd5e1;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    .demo-video {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .video-placeholder {
+      aspect-ratio: 16/9;
+      background: #0f172a;
+      border-radius: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .video-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-button {
+      width: 4rem;
+      height: 4rem;
+      background: rgba(6, 182, 212, 0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .play-button:hover {
+      background: #06b6d4;
+      transform: scale(1.1);
+    }
+
+    .demo-video h3 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .demo-video p {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin: 0;
+    }
+
+    .feature-points {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .feature-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .feature-point-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      background: rgba(6, 182, 212, 0.2);
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #06b6d4;
+      flex-shrink: 0;
+    }
+
+    .feature-point-content {
+      flex: 1;
+    }
+
+    .feature-point h4 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-point p {
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      margin: 0;
+    }
+
+    .benefits {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .benefit-card {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .benefit-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .benefit-icon {
+      width: 3rem;
+      height: 3rem;
+      background: rgba(6, 182, 212, 0.2);
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #06b6d4;
+      flex-shrink: 0;
+    }
+
+    .benefit-content h3 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .benefit-content p {
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      margin: 0;
+    }
+
+    .social-proof {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.1));
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(6, 182, 212, 0.2);
+    }
+
+    .social-proof-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .social-proof-header i {
+      color: #06b6d4;
+    }
+
+    .social-proof-header span {
+      font-weight: 600;
+    }
+
+    .testimonial {
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    .author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .author-avatar {
+      width: 2rem;
+      height: 2rem;
+      background: #64748b;
+      border-radius: 50%;
+    }
+
+    .author-info .name {
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .author-info .title {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .auth-right {
+      background: transparent;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-form-container {
+      width: 100%;
+      max-width: 28rem;
+    }
+
+    .auth-form-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-form-header img {
+      height: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .auth-form-header h2 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-form-header p {
+      color: #cbd5e1;
+    }
+
+    .form-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-radius: 1rem;
+      padding: 2.5rem;
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #374151;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: rgba(30, 41, 59, 0.7);
+      color: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+    }
+    
+    .form-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .password-input {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 0.25rem;
+    }
+
+    .password-toggle:hover {
+      color: white;
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      color: #cbd5e1;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      border-radius: 0.25rem;
+    }
+
+    .forgot-link {
+      color: #06b6d4;
+      text-decoration: none;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, #0891b2, #2563eb);
+      transform: translateY(-1px);
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #9ca3af;
+    }
+
+    .form-footer a {
+      color: #06b6d4;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .form-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .social-divider {
+      position: relative;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    .social-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #374151;
+    }
+
+    .social-divider span {
+      background: rgba(15, 23, 42, 0.75);
+      padding: 0 1rem;
+      color: #9ca3af;
+      font-size: 0.875rem;
+      position: relative;
+    }
+
+    .social-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border: 1px solid #374151;
+      border-radius: 0.5rem;
+      background: rgba(30, 41, 59, 0.7);
+      color: #cbd5e1;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .social-btn:hover {
+      background: rgba(51, 65, 85, 0.8);
+      border-color: #4b5563;
+    }
+
+    .social-btn svg {
+        color: white;
+    }
+
+    .terms-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      color: #cbd5e1;
+    }
+
+    .terms-checkbox input[type="checkbox"] {
+      margin-top: 0.125rem;
+      border-radius: 0.25rem;
+    }
+
+    .terms-checkbox a {
+      color: #06b6d4;
+      text-decoration: none;
+    }
+
+    .terms-checkbox a:hover {
+      text-decoration: underline;
+    }
+ 
+    /* Dashboard Styles */
+    .dashboard-page {
+      display: none;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .dashboard-page::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://nordicapis.com/wp-content/uploads/7-Best-Image-Recognition-APIs-e1587080882739-1024x576.jpg') center/cover;
+      opacity: 0.1;
+      z-index: 1;
+    }
+    
+    .dashboard-main {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+    }
+
+    .dashboard-header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 15px 25px;
+      font-size: 1.8em;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    .dashboard-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 2rem;
+      padding: 2rem;
+      background: transparent;
+      overflow-y: auto;
+    }
+
+    .dashboard-left-column, .dashboard-right-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      min-width: 400px;
+      max-width: 820px;
+    }
+
+    #camera-view-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      transform: scale(0.95);
+      pointer-events: none;
+      transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    }
+    
+    #camera-view-container.view-visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .dashboard-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100%;
+      background: #1a1a40;
+      color: white;
+      padding: 20px;
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .dashboard-page.sidebar-open .dashboard-sidebar {
+      transform: translateX(0);
+    }
+
+    .dashboard-menu {
+      margin-top: 60px;
+    }
+
+    .dashboard-menu button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 15px 20px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      background: #2c3e50;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      transition: background-color 0.2s;
+    }
+
+    .dashboard-menu button:hover {
+      background: #1abc9c;
+    }
+
+    .dashboard-menu button:disabled {
+      background: #555;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .dashboard-toggle {
+      position: fixed;
+      top: 90px;
+      left: 20px;
+      background: linear-gradient(135deg, #0dba8e, #18589c);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .dashboard-page.sidebar-open .dashboard-toggle {
+      transform: translateX(200px);
+    }
+
+    .dashboard-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .dashboard-page.sidebar-open .dashboard-overlay {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .dashboard-header-left,
+    .dashboard-header-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .dashboard-header-right {
+      justify-content: flex-end;
+    }
+
+    .dashboard-header-logo {
+      height: 50px;
+      width: auto;
+      background: #0f2e3b;
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 820px;
+      aspect-ratio: 4/3;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background: black;
+      border: 2px solid rgba(59, 130, 246, 0.5);
+    }
+
+    #video-feed {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: filter 0.2s ease-in-out;
+    }
+
+    #status-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      z-index: 10;
+      display: none;
+    }
+
+    #object-counter {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      z-index: 10;
+      border: 2px solid #0ea5e9;
+    }
+    
+    .dashboard-controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .control-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .control-btn.start {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: white;
+    }
+    .control-btn.start:hover {
+        background: linear-gradient(135deg, #0891b2, #2563eb);
+    }
+    .control-btn.stop {
+        background-color: #e74c3c;
+        color: white;
+    }
+    .control-btn.stop:hover {
+        background-color: #c0392b;
+    }
+    .control-btn:disabled {
+        background: #555;
+        color: #999;
+        cursor: not-allowed;
+    }
+    
+    .detection-log-container {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 0.75rem;
+      padding: 1rem 1.5rem;
+      color: white;
+      min-height: 500px;
+    }
+
+    .detection-log-container h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #06b6d4;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+      padding-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .log-list {
+      height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .log-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    .log-list::-webkit-scrollbar-track {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 4px;
+    }
+    .log-list::-webkit-scrollbar-thumb {
+      background-color: #06b6d4;
+      border-radius: 4px;
+    }
+
+    .log-list p, .log-list div {
+      padding: 0.25rem 0.5rem;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    }
+
+    .log-list p:last-child, .log-list div:last-child {
+      border-bottom: none;
+    }
+
+    .log-placeholder {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .alerts-container {
+      flex-basis: 100%;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      border-radius: 0.75rem;
+      padding: 1rem 1.5rem;
+      margin-top: 1rem;
+      color: white;
+    }
+
+    .alerts-container h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #eab308;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    #alert-message {
+      font-size: 1.2rem;
+      font-weight: 500;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    #alert-message.alert-monitoring {
+      color: #cbd5e1;
+      background: rgba(30, 41, 59, 0.5);
+    }
+
+    #alert-message.alert-danger {
+      color: white;
+      background: rgba(220, 38, 38, 0.7);
+      border: 1px solid #ef4444;
+    }
+
+    #alert-message.alert-clear {
+      color: white;
+      background: rgba(34, 197, 94, 0.7);
+      border: 1px solid #22c55e;
+    }
+
+    /* <<< NEW: CSS class to hide/show panels >>> */
+    .dashboard-panel {
+      display: none;
+      width: 100%;
+    }
+    .dashboard-panel.visible {
+      display: block;
+    }
+
+    /* New Settings Submenu Styles */
+    .settings-chevron {
+        margin-left: auto;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    button.settings-open .settings-chevron {
+        transform: rotate(180deg);
+    }
+
+    .settings-submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+        background: #1e1e48;
+        border-radius: 6px;
+        margin: -5px 0 5px 0;
+        padding-left: 15px;
+    }
+
+    .settings-submenu.open {
+        max-height: 220px;
+    }
+
+    .submenu-item {
+        padding: 12px 15px;
+        color: #bdc3c7;
+        font-size: 0.9rem;
+        word-wrap: break-word;
+    }
+
+    .submenu-item strong {
+        color: #ecf0f1;
+    }
+
+    .submenu-item label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    #brightness-slider {
+        width: 100%;
+        cursor: pointer;
+    }
+
+    .submenu-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 12px 15px;
+        margin: 0;
+        border: none;
+        border-radius: 0 0 6px 6px;
+        background: #34495e;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        text-align: left;
+        transition: background-color 0.2s;
+    }
+
+    .submenu-btn:hover {
+        background: #c0392b;
+    }
+
+
+    /* Gallery Modal */
+    .gallery-modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    .gallery-modal-content {
+      background: #1e293b;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #0ea5e9;
+      border-radius: 12px;
+      width: 80%;
+      max-width: 1200px;
+      color: white;
+    }
+
+    .gallery-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .gallery-modal-header h2 {
+      color: #0ea5e9;
+    }
+
+    .gallery-close-btn {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .gallery-close-btn:hover {
+      color: white;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      max-height: 70vh;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .gallery-item {
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #0ea5e9;
+    }
+
+    .gallery-item-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(14, 165, 233, 0.8);
+      color: white;
+      text-align: center;
+      padding: 8px 0;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: background 0.2s ease;
+    }
+
+    .gallery-item:hover .gallery-item-label {
+      background: rgba(2, 132, 199, 0.95);
+    }
+
+    #gallery-placeholder {
+      text-align: center;
+      width: 100%;
+      grid-column: 1 / -1;
+      padding: 50px 0;
+      color: #94a3b8;
+    }
+       /* Robot Animation Styles */
+    #welcome-robot-container {
+      position: fixed;
+      bottom: 0;
+      left: 30px;
+      z-index: 1001;
+      transform: translateX(-300px);
+      animation: robot-slide-in 1.5s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    @keyframes robot-slide-in {
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    .robot {
+      width: 150px;
+      height: 225px;
+      position: relative;
+      animation: robot-hover 3s infinite ease-in-out 2s;
+      bottom:60px;
+    }
+
+    @keyframes robot-hover {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    #welcome-bubble {
+      position: absolute;
+      bottom: 360px;
+      left: -10px;
+      background: white;
+      color: #0f172a;
+      padding: 15px 20px;
+      border-radius: 15px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      opacity: 0;
+      animation: text-fade-in 1s 2s forwards;
+      white-space: nowrap;
+    }
+    #welcome-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 30px;
+      border-width: 10px;
+      border-style: solid;
+      border-color: white transparent transparent transparent;
+    }
+    @keyframes text-fade-in {
+      to {
+        opacity: 1;
+      }
+    }
+
+    
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .dashboard-content {
+          flex-direction: column;
+          align-items: center;
+        }
+        .dashboard-left-column, .dashboard-right-column {
+          width: 100%;
+          max-width: 820px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .auth-container {
+        grid-template-columns: 1fr;
+        padding: 2rem 1rem;
+        gap: 0;
+      }
+
+      .auth-left {
+        display: none;
+      }
+
+      .auth-right {
+         padding: 0;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .about-content {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      .contact-modal-content {
+        margin: 10% auto;
+        padding: 1.5rem;
+      }
+    }
+
+    /* Hide pages by default */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Home Page -->
+  <div id="home" class="page active home-page">
+    <header class="header">
+      <a href="#" class="logo" onclick="showPage('home')">
+        <img src="https://robocoupler.com/wp-content/uploads/2024/04/PicsArt_01-13-07.06.45.png" alt="Robocoupler Logo">
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="openContactModal()">Contact Us</a>
+      </nav>
+      <div class="auth-buttons">
+        <a href="#" class="btn btn-outline" onclick="showPage('login')">Login</a>
+        <a href="#" class="btn btn-primary" onclick="showPage('signup')">Sign Up</a>
+      </div>
+    </header>
+    <section class="hero">
+      <h1>AI-POWERED<br><span class="highlight">OBJECT DETECTION</span></h1>
+      <p>Leverage cutting-edge AI to detect, identify, and track objects in real-time. Perfect for security, automation, and intelligent monitoring systems.</p>
+      <div class="hero-buttons"><a href="#" class="btn btn-primary btn-large" onclick="showPage('login')">Get Started</a></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-number">99.5%</div><div class="stat-label">Accuracy Rate</div></div>
+        <div class="stat"><div class="stat-number">60 FPS</div><div class="stat-label">Real-time Processing</div></div>
+        <div class="stat"><div class="stat-number">1000+</div><div class="stat-label">Object Classes</div></div>
+      </div>
+    </section>
+    <section id="features" class="features">
+      <h2>Powerful Features for Modern Applications</h2>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-eye"></i></div><h3>Real-Time Detection</h3><p>Process live video feeds with minimal latency for instant object recognition and tracking.</p></div>
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-bolt"></i></div><h3>High Performance</h3><p>Optimized algorithms deliver exceptional speed without compromising accuracy.</p></div>
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-code"></i></div><h3>Easy Integration</h3><p>RESTful APIs and SDKs for seamless integration into your existing applications.</p></div>
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3>Enterprise Security</h3><p>Bank-grade security with encrypted data transmission and secure cloud storage.</p></div>
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-server"></i></div><h3>Scalable Infrastructure</h3><p>Auto-scaling cloud infrastructure handles from single to  multiple cameras to thousands of feeds.</p></div>
+        <div class="feature-card"><div class="feature-icon"><i class="fas fa-chart-bar"></i></div><h3>Advanced Analytics</h3><p>Comprehensive dashboards and reporting for deep insights into detection patterns.</p></div>
+      </div>
+    </section>
+    <section class="cta">
+      <h2>Ready to Transform Your Vision?</h2>
+      <p>Join thousands of developers and businesses using our AI-powered object detection platform.</p>
+      <a href="#" class="btn btn-primary btn-large" onclick="showPage('signup')">Get Started Today</a>
+    </section>
+    <footer class="footer"><p>© 2025 Robocoupler Pvt Ltd. All rights reserved.</p></footer>
+    <div id="welcome-robot-container">
+      <div class="robot">
+        <div class="robot"><img src="/static/robo1.png" alt="Robo"></div>
+      </div>
+      <div id="welcome-bubble">Hi There!Welcome To RoboCoupler</div>
+    </div>
+  </div>
+
+  <!-- About Page -->
+  <div id="about" class="page about-page">
+    <header class="header">
+      <a href="#" class="logo" onclick="showPage('home')"><img src="https://robocoupler.com/wp-content/uploads/2024/04/PicsArt_01-13-07.06.45.png" alt="Robocoupler Logo"></a>
+      <nav class="nav-links"><a href="#" onclick="showPage('home')">Home</a><a href="#" onclick="openContactModal()">Contact Us</a></nav>
+      <div class="auth-buttons"><a href="#" class="btn btn-outline" onclick="showPage('login')">Login</a><a href="#" class="btn btn-primary" onclick="showPage('signup')">Sign Up</a></div>
+    </header>
+    <div class="about-content">
+      <a href="#" class="back-btn" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Back to Home</a>
+      <h1>About Robocoupler</h1>
+      <p>Welcome to <strong>Robocoupler</strong>, an advanced AI-powered platform for real-time object detection. We leverage the latest in computer vision and deep learning to help you detect, classify, and track objects seamlessly—directly from your browser.</p>
+      <h2>Our Mission</h2>
+      <p>Our mission is to make object detection technology accessible, fast, and intuitive for everyone—whether you're a developer, student, researcher, or industry professional.</p>
+      <h2>How It Works</h2><ol><li>User signs in and accesses the dashboard</li><li>Activates live camera or uploads a file</li><li>The AI model processes the input</li><li>Objects are detected and labeled live on-screen</li></ol>
+      <h2>Technology Stack</h2><ul><li><strong>Frontend:</strong> HTML, CSS, JavaScript</li><li><strong>Backend:</strong> Python (Flask or Django)</li><li><strong>AI Models:</strong> YOLO, TensorFlow, Roboflow exports</li><li><strong>Libraries:</strong> OpenCV, WebRTC, TensorFlow.js (if client-side)</li></ul>
+      <h2>Meet the Creator</h2><p>This platform was built by <strong>Gagana deepika and team</strong>, a passionate developer driven by curiosity in AI and real-time vision systems. This project is a fusion of learning and application, aimed at solving real-world problems through smart automation.</p>
+      <h2>Contact & Feedback</h2><p>We love hearing from our users. If you have any questions, feature suggestions, or want to collaborate, please get in touch via the <a href="#" onclick="openContactModal()">Contact Page</a> or email us at <strong>support@robocoupler.com</strong>.</p>
+    </div>
+  </div>
+
+  <!-- Login Page -->
+  <div id="login" class="page auth-page">
+    <div class="auth-container">
+      <div class="auth-left"><div class="auth-left-content"><a href="#" class="back-link" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Back to Home</a><h1>Welcome Back to the Future of <span class="highlight">Object Detection</span></h1><p>Access your AI-powered detection dashboard and continue monitoring your environment with cutting-edge technology.</p><div class="demo-video"><div class="video-placeholder"><img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="AI Detection Demo"><div class="video-overlay"><div class="play-button"><i class="fas fa-play"></i></div></div></div><h3>Live Detection Demo</h3><p>See our AI in action with real-time object detection and tracking capabilities.</p></div><div class="feature-points"><div class="feature-point"><div class="feature-point-icon"><i class="fas fa-shield-alt"></i></div><div class="feature-point-content"><h4>Enterprise-grade security and privacy</h4><p>Your data is protected with bank-level encryption</p></div></div><div class="feature-point"><div class="feature-point-icon"><i class="fas fa-bolt"></i></div><div class="feature-point-content"><h4>Real-time processing with 60 FPS capability</h4><p>Lightning-fast detection without compromising accuracy</p></div></div><div class="feature-point"><div class="feature-point-icon"><i class="fas fa-chart-bar"></i></div><div class="feature-point-content"><h4>Advanced analytics and reporting dashboard</h4><p>Comprehensive insights into detection patterns</p></div></div></div></div></div>
+      <div class="auth-right"><div class="auth-form-container"><div class="auth-form-header"><img src="https://robocoupler.com/wp-content/uploads/2024/04/PicsArt_01-13-07.06.45.png" alt="Robocoupler Logo"><h2>Sign in to your account</h2><p>Enter your credentials to access your detection dashboard</p></div><div class="form-card"><h3 class="form-title">Login</h3><form onsubmit="handleLogin(event)"><div class="form-group"><label class="form-label" for="login-email">Email Address</label><input type="email" id="login-email" class="form-input" placeholder="you@example.com" required></div><div class="form-group"><label class="form-label" for="login-password">Password</label><div class="password-input"><input type="password" id="login-password" class="form-input" placeholder="Enter your password" required><button type="button" class="password-toggle" onclick="togglePassword('login-password')"><i class="fas fa-eye"></i></button></div></div><div class="form-options"><div class="checkbox-group"><input type="checkbox" id="remember-me"><label for="remember-me">Remember me</label></div><a href="#" class="forgot-link">Forgot password?</a></div><button type="submit" class="submit-btn">Sign In</button></form><div class="form-footer"><p>Don't have an account? <a href="#" onclick="showPage('signup')">Sign up here</a></p></div><div class="social-divider"><span>Or continue with</span></div><div class="social-buttons"><a href="#" class="social-btn"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google</a><a href="#" class="social-btn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clipRule="evenodd" /></svg> Facebook</a></div></div></div></div>
+    </div>
+  </div>
+
+  <!-- Signup Page -->
+  <div id="signup" class="page auth-page">
+    <div class="auth-container">
+      <div class="auth-left"><div class="auth-left-content"><a href="#" class="back-link" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Back to Home</a><h1>Join the AI Revolution in <span class="highlight">Object Detection</span></h1><p>Start your journey with the most advanced object detection platform. Trusted by enterprises worldwide.</p><div class="benefits"><div class="benefit-card"><div class="benefit-header"><div class="benefit-icon"><i class="fas fa-check-circle"></i></div><div class="benefit-content"><h3>Instant Access</h3><p>Full access to all features immediately after signup. Start detecting objects right away.</p></div></div></div><div class="benefit-card"><div class="benefit-header"><div class="benefit-icon"><i class="fas fa-users"></i></div><div class="benefit-content"><h3>Expert Support</h3><p>24/7 technical support from our AI specialists to help you succeed.</p></div></div></div><div class="benefit-card"><div class="benefit-header"><div class="benefit-icon"><i class="fas fa-globe"></i></div><div class="benefit-content"><h3>Global Infrastructure</h3><p>Deploy across multiple regions with auto-scaling capabilities.</p></div></div></div></div><div class="social-proof"><div class="social-proof-header"><i class="fas fa-award"></i><span>Trusted by Industry Leaders</span></div><p class="testimonial">"Robocoupler's object detection has revolutionized our security operations with 99.5% accuracy."</p><div class="author"><div class="author-avatar"></div><div class="author-info"><div class="name">Sarah Chen</div><div class="title">CTO, TechCorp Industries</div></div></div></div></div></div>
+      <div class="auth-right"><div class="auth-form-container"><div class="auth-form-header"><img src="https://robocoupler.com/wp-content/uploads/2024/04/PicsArt_01-13-07.06.45.png" alt="Robocoupler Logo"><h2>Create your account</h2><p>Start your AI object detection journey today</p></div><div class="form-card"><h3 class="form-title">Sign Up</h3><form onsubmit="handleSignup(event)"><div class="form-group"><label class="form-label" for="signup-name">Full Name</label><input type="text" id="signup-name" class="form-input" placeholder="John Doe" required></div><div class="form-group"><label class="form-label" for="signup-email">Email Address</label><input type="email" id="signup-email" class="form-input" placeholder="you@company.com" required></div><div class="form-group"><label class="form-label" for="signup-password">Password</label><div class="password-input"><input type="password" id="signup-password" class="form-input" placeholder="Create a strong password" required><button type="button" class="password-toggle" onclick="togglePassword('signup-password')"><i class="fas fa-eye"></i></button></div></div><div class="form-group"><label class="form-label" for="signup-confirm-password">Confirm Password</label><div class="password-input"><input type="password" id="signup-confirm-password" class="form-input" placeholder="Confirm your password" required><button type="button" class="password-toggle" onclick="togglePassword('signup-confirm-password')"><i class="fas fa-eye"></i></button></div></div><div class="terms-checkbox"><input type="checkbox" id="terms" required><label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label></div><button type="submit" class="submit-btn">Create Account</button></form><div class="form-footer"><p>Already have an account? <a href="#" onclick="showPage('login')">Sign in here</a></p></div><div class="social-divider"><span>Or sign up with</span></div><div class="social-buttons"><a href="#" class="social-btn"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google</a><a href="#" class="social-btn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clipRule="evenodd" /></svg> Facebook</a></div></div></div></div>
+    </div>
+  </div>
+
+  <div id="dashboard" class="page dashboard-page">
+    <div class="dashboard-sidebar" id="sidebar">
+      <div class="dashboard-menu" id="menu">
+        <button onclick="showCameraView()">▶ Start</button>
+        <button onclick="hideCameraView()">⏹ Close View</button>
+        <button onclick="openGallery()">📦 Gallery</button>
+        <button onclick="toggleSettingsMenu(this)">
+            ⚙ Settings <i class="fas fa-chevron-down settings-chevron"></i>
+        </button>
+        <div class="settings-submenu">
+            <div class="submenu-item" id="account-details">
+                <strong>Account:</strong>
+                <span id="user-account-email">Not logged in</span>
+            </div>
+            <div class="submenu-item">
+                <label for="brightness-slider">Brightness</label>
+                <input type="range" id="brightness-slider" min="50" max="150" value="100" oninput="adjustBrightness(this.value)">
+            </div>
+            <button class="submenu-btn" onclick="deleteAllImages()">
+                <i class="fas fa-trash-alt"></i> Delete All Images
+            </button>
+        </div>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </div>
+    <button class="dashboard-toggle" id="toggleBtn" onclick="toggleMenu()" aria-label="Toggle Sidebar">☰</button>
+    <div class="dashboard-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="dashboard-main">
+      <div class="dashboard-header">
+        <div class="dashboard-header-left">
+          <img src="https://robocoupler.com/wp-content/uploads/2024/04/PicsArt_01-13-07.06.45.png" alt="Robocoupler Logo" class="dashboard-header-logo">
+        </div>
+        <span>🤖 Robocoupler AI Object Detection</span>
+        <div class="dashboard-header-right"></div>
+      </div>
+      <div class="dashboard-content">
+        <!-- Left Column -->
+        <div class="dashboard-left-column">
+            <!-- <<< MODIFIED: Added 'dashboard-panel' class >>> -->
+            <div class="detection-log-container dashboard-panel">
+                <h3><i class="fas fa-clipboard-list"></i> Detection Log (Current Frame)</h3>
+                <div id="detection-log-list" class="log-list">
+                    <p class="log-placeholder">Detection log will appear here...</p>
+                </div>
+            </div>
+        </div>
+        <!-- Right Column -->
+        <div class="dashboard-right-column">
+            <div id="camera-view-container">
+                <div class="video-wrapper">
+                  <img id="video-feed" src="" alt="Live feed from server">
+                  <div id="status-message">Ready</div>
+                  <div id="object-counter">Objects: 0</div>
+                </div>
+                <div class="dashboard-controls">
+                    <button id="startDetectionBtn" class="control-btn start" onclick="startDetection()">Start Detection</button>
+                    <button id="stopDetectionBtn" class="control-btn stop" onclick="stopDetection()" disabled>Stop Detection</button>
+                </div>
+            </div>
+        </div>
+        <!-- Bottom Row -->
+        <!-- <<< MODIFIED: Added 'dashboard-panel' class >>> -->
+        <div class="alerts-container dashboard-panel">
+            <h3><i class="fas fa-exclamation-triangle"></i> System Alerts</h3>
+            <div id="alert-message" class="alert-monitoring">
+                System is idle. Start detection to begin monitoring.
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="contact-modal">
+    <div class="contact-modal-content">
+      <div class="contact-modal-header"><h2>Contact Us</h2><button class="contact-close" onclick="closeContactModal()">×</button></div>
+      <p class="contact-description">We are Robocoupler Pvt Ltd, committed to advanced AI-based surveillance and automation solutions. Reach out for any enquiry or support.</p>
+      <form class="contact-form" onsubmit="handleContactSubmit(event)"><input type="text" class="contact-input" placeholder="Your Name" required><input type="email" class="contact-input" placeholder="Your Email" required><textarea class="contact-textarea" placeholder="Your Feedback" required></textarea><button type="submit" class="contact-submit">Send Message</button></form>
+    </div>
+  </div>
+
+  <!-- Gallery Modal -->
+  <div id="galleryModal" class="gallery-modal">
+    <div class="gallery-modal-content">
+      <div class="gallery-modal-header"><h2>Detected Objects Gallery</h2><span id="closeGalleryBtn" class="gallery-close-btn">×</span></div>
+      <div id="galleryGrid" class="gallery-grid"><p id="galleryPlaceholder">Loading images...</p></div>
+    </div>
+  </div>
+
+  <audio id="siren" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+
+  <script>
+    // Initialize Socket.IO
+    const socket = io();
+
+    // Global state
+    let currentUserEmail = '';
+    let isDetecting = false;
+
+    // Page Navigation
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      if (pageId === 'dashboard') {
+        initializeDashboard();
+      } else {
+        if (isDetecting) stopDetection(true); // Force stop and hide on leaving page
+        if (document.getElementById('dashboard').classList.contains('sidebar-open')) toggleMenu();
+      }
+    }
+
+    // Contact Modal
+    function openContactModal() { document.getElementById('contactModal').style.display = 'block'; }
+    function closeContactModal() { document.getElementById('contactModal').style.display = 'none'; }
+    function handleContactSubmit(event) {
+      event.preventDefault();
+      alert('Thank you for your message! We will get back to you soon.');
+      closeContactModal();
+      event.target.reset();
+    }
+    window.onclick = function(event) {
+      const contactModal = document.getElementById('contactModal');
+      const galleryModal = document.getElementById('galleryModal');
+      if (event.target == contactModal) closeContactModal();
+      if (event.target == galleryModal) closeGallery();
+    }
+
+    // Auth Forms
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const icon = input.nextElementSibling.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+      }
+    }
+    
+    function handleLogin(event) { 
+        event.preventDefault(); 
+        currentUserEmail = document.getElementById('login-email').value || 'user@example.com';
+        showPage('dashboard'); 
+    }
+    
+    function handleSignup(event) {
+      event.preventDefault();
+      if (document.getElementById('signup-password').value !== document.getElementById('signup-confirm-password').value) {
+        alert("Passwords don't match!");
+        return;
+      }
+      currentUserEmail = document.getElementById('signup-email').value || 'newuser@example.com';
+      showPage('dashboard');
+    }
+
+    // Dashboard functionality
+    const dashboard = document.getElementById("dashboard");
+    const videoFeed = document.getElementById("video-feed");
+    const siren = document.getElementById("siren");
+    const statusMessage = document.getElementById("status-message");
+    const objectCounter = document.getElementById("object-counter");
+    const galleryModal = document.getElementById("galleryModal");
+    const galleryGrid = document.getElementById("galleryGrid");
+    const galleryPlaceholder = document.getElementById("galleryPlaceholder");
+    const closeGalleryBtn = document.getElementById("closeGalleryBtn");
+    const cameraViewContainer = document.getElementById("camera-view-container");
+    const startDetectionBtn = document.getElementById('startDetectionBtn');
+    const stopDetectionBtn = document.getElementById('stopDetectionBtn');
+    const detectionLogList = document.getElementById('detection-log-list');
+    const alertMessage = document.getElementById('alert-message');
+
+
+    function initializeDashboard() {
+        hideCameraView(); // This will now also hide the panels
+        document.getElementById('user-account-email').textContent = currentUserEmail;
+        videoFeed.style.filter = 'brightness(100%)';
+        document.getElementById('brightness-slider').value = 100;
+    }
+
+    // <<< MODIFIED: This function now shows the camera AND the other panels >>>
+    function showCameraView() {
+        cameraViewContainer.classList.add('view-visible');
+        showStatus("Ready. Click 'Start Detection' below.");
+        
+        // Make the log and alert panels visible
+        document.querySelectorAll('.dashboard-panel').forEach(panel => {
+            panel.classList.add('visible');
+        });
+
+        if (dashboard.classList.contains("sidebar-open")) {
+            toggleMenu();
+        }
+    }
+
+    // <<< MODIFIED: This function now hides the camera AND the other panels >>>
+    function hideCameraView() {
+        if (isDetecting) {
+            stopDetection();
+        }
+        cameraViewContainer.classList.remove('view-visible');
+
+        // Hide the log and alert panels
+        document.querySelectorAll('.dashboard-panel').forEach(panel => {
+            panel.classList.remove('visible');
+        });
+    }
+
+    function showStatus(message) {
+      statusMessage.textContent = message;
+      statusMessage.style.display = 'block';
+    }
+
+    function hideStatus() {
+      statusMessage.style.display = 'none';
+    }
+
+    function updateButtonStates(detecting) {
+      isDetecting = detecting;
+      startDetectionBtn.disabled = detecting;
+      stopDetectionBtn.disabled = !detecting;
+    }
+
+    function toggleMenu() {
+      dashboard.classList.toggle("sidebar-open");
+      document.getElementById("toggleBtn").innerHTML = dashboard.classList.contains("sidebar-open") ? '✕' : '☰';
+    }
+
+    // New Settings Functions
+    function toggleSettingsMenu(button) {
+      const submenu = button.nextElementSibling;
+      submenu.classList.toggle('open');
+      button.classList.toggle('settings-open');
+    }
+    
+    function adjustBrightness(value) {
+        videoFeed.style.filter = `brightness(${value}%)`;
+    }
+
+    function deleteAllImages() {
+        if (confirm("Are you sure you want to permanently delete all images from the gallery? This action cannot be undone.")) {
+            console.log("Requesting to delete all images...");
+            socket.emit('delete_all_images');
+        }
+    }
+    // END New Settings Functions
+
+    function openGallery() {
+      galleryPlaceholder.textContent = "Loading images...";
+      galleryGrid.innerHTML = '';
+      galleryGrid.appendChild(galleryPlaceholder);
+      galleryModal.style.display = "block";
+      socket.emit('get_gallery_images');
+    }
+
+    function closeGallery() {
+      galleryModal.style.display = "none";
+    }
+
+    function startDetection() {
+      if (isDetecting) return;
+      console.log("Requesting server to start camera...");
+      socket.emit('start_camera');
+      updateButtonStates(true);
+      showStatus("Starting detection stream...");
+      alertMessage.className = 'alert-monitoring';
+      alertMessage.textContent = 'Initializing stream...';
+    }
+    
+    // <<< MODIFIED: stopDetection now also ensures panels are hidden >>>
+    function stopDetection(forceHide = false) {
+      if (!isDetecting) return;
+      console.log("Requesting server to stop camera...");
+      socket.emit('stop_camera');
+      updateButtonStates(false);
+      showStatus("Detection stopped. Click 'Start Detection' to begin again.");
+      objectCounter.textContent = 'Objects: 0';
+      videoFeed.src = ""; // Clear the image
+      siren.pause();
+      siren.currentTime = 0;
+      
+      // Reset log and alerts
+      detectionLogList.innerHTML = '<p class="log-placeholder">Detection stopped. Log is clear.</p>';
+      alertMessage.className = 'alert-monitoring';
+      alertMessage.textContent = 'System is idle. Start detection to begin monitoring.';
+      
+      if(forceHide) {
+        hideCameraView(); // This will hide the camera and the panels
+      }
+    }
+
+    function logout() {
+      if (confirm("Are you sure you want to log out?")) {
+        if (isDetecting) stopDetection(true);
+        currentUserEmail = '';
+        showPage('home');
+      }
+    }
+
+    // Socket.IO Event Handlers
+    socket.on('image_update', (data) => {
+      if (!isDetecting) return;
+      hideStatus();
+      videoFeed.src = 'data:image/jpeg;base64,' + data.image;
+      objectCounter.textContent = `Objects: ${data.count}`;
+      
+      // Update the detection log
+      detectionLogList.innerHTML = ''; 
+      if (data.detections && data.detections.length > 0) {
+          data.detections.forEach(detectionText => {
+              const logEntry = document.createElement('div');
+              logEntry.textContent = `✅ ${detectionText}`;
+              detectionLogList.appendChild(logEntry);
+          });
+      } else {
+          const placeholder = document.createElement('p');
+          placeholder.textContent = 'No objects detected in this frame.';
+          placeholder.className = 'log-placeholder';
+          detectionLogList.appendChild(placeholder);
+      }
+      detectionLogList.scrollTop = detectionLogList.scrollHeight;
+
+      // Update Alerts Panel
+      if (data.alert_status === 'danger') {
+          alertMessage.className = 'alert-danger';
+          alertMessage.textContent = 'DANGER DETECTED! Person, Boulder, or Branch nearby. Proceed with caution.';
+      } else if (data.alert_status === 'clear') {
+          alertMessage.className = 'alert-clear';
+          alertMessage.textContent = 'ALL CLEAR! No immediate threats detected. It is safe to proceed.';
+      } else { // 'monitoring'
+          alertMessage.className = 'alert-monitoring';
+          alertMessage.textContent = 'Monitoring... No critical objects detected in this frame.';
+      }
+
+      if (data.dangerous && siren.paused) {
+        siren.play().catch(e => console.error("Audio play error:", e));
+      } else if (!data.dangerous) {
+        siren.pause();
+        siren.currentTime = 0;
+      }
+    });
+
+    socket.on('gallery_content', (imageData) => {
+      galleryGrid.innerHTML = '';
+      if (imageData && imageData.length > 0) {
+        imageData.forEach(item => {
+          const galleryItem = document.createElement('div');
+          galleryItem.className = 'gallery-item';
+          galleryItem.onclick = () => window.open(item.url, '_blank');
+          const img = document.createElement('img');
+          img.src = item.url;
+          img.alt = `Detected ${item.class}`;
+          const label = document.createElement('p');
+          label.className = 'gallery-item-label';
+          label.textContent = item.class;
+          galleryItem.appendChild(img);
+          galleryItem.appendChild(label);
+          galleryGrid.appendChild(galleryItem);
+        });
+      } else {
+        galleryPlaceholder.textContent = "No detected images found in the gallery.";
+        galleryGrid.appendChild(galleryPlaceholder);
+      }
+    });
+
+    socket.on('gallery_deleted', (response) => {
+        alert(response.message);
+        if (galleryModal.style.display === "block") {
+            openGallery();
+        }
+    });
+
+    socket.on('connect', () => {
+      console.log("Successfully connected to the server.");
+    });
+
+    socket.on('disconnect', () => {
+      console.error("Disconnected from server.");
+      if (document.getElementById('dashboard').classList.contains('active')) {
+        showStatus("Connection lost. Please refresh.");
+        updateButtonStates(false);
+        stopDetectionBtn.disabled = true;
+      }
+    });
+
+    // Event listeners
+    closeGalleryBtn.onclick = closeGallery;
+    window.addEventListener('beforeunload', () => { if (socket.connected) socket.disconnect(); });
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target && this.getAttribute('href') !== '#') {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
